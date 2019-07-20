@@ -8,7 +8,7 @@ except:
   quit fmt"usage: {paramStr 0} <tokipona.json>"
 
 type
-  WordKind* = enum
+  WordKind* {.pure.} = enum
     noun = "n",
     intransitiveVerb = "vi",
     transitiveVerb = "vt",
@@ -26,20 +26,36 @@ type
     category*: Option[string]
 
   PhraseKind* {.pure.} = enum
-    subject,
+    noun,
     verb,
-    indirectObject,
-    directObject,
 
   Phrase* = ref object
     case kind*: PhraseKind
-    of PhraseKind.subject, PhraseKind.indirectObject, PhraseKind.directObject:
+    of PhraseKind.noun:
       noun*: Word
     of PhraseKind.verb:
       preverb*: Word
       verb*: Word
 
     modifiers*: Option[seq[Word]]
+
+proc isNoun(w: Word): bool =
+  result = false
+
+  if WordKind.noun in w.grammar:
+    result = true
+
+proc isVerb(w: Word): bool =
+  result = false
+
+  if WordKind.intransitiveVerb in w.grammar or WordKind.transitiveVerb in w.grammar:
+    result = true
+
+proc isModifier(w: Word): bool =
+  result = false
+
+  if WordKind.modifier in w.grammar:
+    result = true
 
 proc `$`*(w: Word): string =
   if w.category.isSome:
@@ -53,7 +69,7 @@ proc `$`*(p: Phrase): string =
     modifiers: string
 
   case p.kind
-  of PhraseKind.subject, PhraseKind.indirectObject, PhraseKind.directObject:
+  of PhraseKind.noun:
     base = p.noun.name
   of PhraseKind.verb:
     base = p.verb.name
@@ -77,8 +93,6 @@ for word in words:
 var
   rawSentence = readLineFromStdin "|toki: "
   splitSentence = rawSentence.split " "
-  sentence = newSeq[Phrase]()
-  curr: Phrase
   lastWord: Word
 
 for word in splitSentence:
@@ -86,9 +100,6 @@ for word in splitSentence:
     quit fmt"unknown word: {word}"
 
   let thisWord = dict[word]
-  echo fmt"found: {thisWord}"
-
-  for grm in thisWord.grammar:
-    echo grm
+  echo fmt"found: {thisWord.name}, noun: {thisWord.isNoun}, verb: {thisWord.isVerb}, mod: {thisWord.isModifier}"
 
   lastWord = thisWord
