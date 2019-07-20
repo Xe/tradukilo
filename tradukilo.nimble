@@ -2,11 +2,11 @@
 
 version       = "0.1.0"
 author        = "Christine Dodrill"
-description   = "Esperanto tools for Nim"
+description   = "Linguistic tools for Nim"
 license       = "MIT"
 srcDir        = "src"
 installExt    = @["nim"]
-bin           = @["tradukilo"]
+bin           = @["tradukilo", "sona"]
 binDir        = "bin"
 
 
