@@ -1,14 +1,8 @@
 import json, options, os, rdstdin, streams, strformat, strutils, tables
 
-var fName: string
-
-try:
-  fName = paramStr 1
-except:
-  quit fmt"usage: {paramStr 0} <tokipona.json>"
-
 type
   WordKind* {.pure.} = enum
+    ## Word types. These map to English terms, approximately.
     noun = "n",
     intransitiveVerb = "vi",
     transitiveVerb = "vt",
@@ -20,16 +14,19 @@ type
     punctuation = "punct",
 
   Word* = ref object of RootObj
+    ## An individual Toki Pona word.
     name*: string
     grammar*: seq[WordKind]
     gloss*: string
     category*: Option[string]
 
   PhraseKind* {.pure.} = enum
+    ## The kind of phrase, used for parsing.
     noun,
     verb,
 
   Phrase* = ref object
+    ## A phrase is a group of words.
     case kind*: PhraseKind
     of PhraseKind.noun:
       noun*: Word
@@ -39,58 +36,49 @@ type
 
     modifiers*: Option[seq[Word]]
 
-proc isNoun(w: Word): bool =
+proc isNoun*(w: Word): bool =
+  ## Returns true if the Word is a noun.
   result = false
 
   if WordKind.noun in w.grammar:
     result = true
 
-proc isVerb(w: Word): bool =
+proc isVerb*(w: Word): bool =
+  ## Returns true if the Word is a verb (transitive or intransitive).
   result = false
 
   if WordKind.intransitiveVerb in w.grammar or WordKind.transitiveVerb in w.grammar:
     result = true
 
-proc isModifier(w: Word): bool =
+proc isModifier*(w: Word): bool =
+  ## Returns true if the word is a modifier (~= adjective).
   result = false
 
   if WordKind.modifier in w.grammar:
     result = true
 
 proc `$`*(w: Word): string =
+  ## Pretty-prints a Word
   if w.category.isSome:
     result = fmt"{w.name}: grammar({w.grammar}), gloss({w.gloss}), category({w.category.get})"
   else:
     result = fmt"{w.name}: grammar({w.grammar}), gloss({w.gloss})"
 
-proc `$`*(p: Phrase): string =
+proc loadDictionary*(s: Stream): TableRef[string, Word] =
+  ## Loads the toki pona dictionary into a Table from a Stream.
   var
-    base: string
-    modifiers: string
+    nodes = json.parseJson(s)
+    words = nodes.to seq[Word]
+  result = newTable[string, Word]()
 
-  case p.kind
-  of PhraseKind.noun:
-    base = p.noun.name
-  of PhraseKind.verb:
-    base = p.verb.name
+  for word in words:
+    result[word.name] = word
 
-  if p.modifiers.isSome:
-    var names = newSeq[string]()
-    for modif in p.modifiers.get:
-      names.add modif.name
-    modifiers = fmt"modifiers: {names}"
-
-  result = fmt"({p.kind}) {base} {modifiers}"
+const
+  tpDictionary = staticRead "../data/tokipona.json"
 
 var
-  nodes = json.parseFile fName
-  words = nodes.to(seq[Word])
-  dict = initTable[string, Word]()
-
-for word in words:
-  dict[word.name] = word
-
-var
+  dict = loadDictionary(newStringStream tpDictionary)
   rawSentence = readLineFromStdin "|toki: "
   splitSentence = rawSentence.split " "
   lastWord: Word
