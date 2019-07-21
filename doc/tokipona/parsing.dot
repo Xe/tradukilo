@@ -1,0 +1,34 @@
+digraph G {
+  init;
+  noun;
+  vi;
+  vt;
+  mod;
+  conj;
+  interj;
+  prep;
+  sepe;
+  
+  init -> noun;
+  init -> vi;
+  init -> vt;
+  init -> interj;
+  interj -> noun;
+  interj -> vi;
+  interj -> vt;
+  init -> prep -> noun;
+  noun -> vi;
+  noun -> vt;
+  noun -> mod;
+  noun -> conj -> noun;
+  mod -> sepe;
+  vi -> mod;
+  vi -> sepe -> vi;
+  sepe -> vt;
+  vt -> sepe -> noun;
+  
+  noun -> end;
+  vi -> end;
+  mod -> end;
+  prep -> sepe;
+}

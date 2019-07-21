@@ -58,27 +58,26 @@ proc isModifier*(w: Word): bool =
     result = true
 
 proc `$`*(w: Word): string =
-  ## Pretty-prints a Word
+  ## Pretty-prints a Word.
   if w.category.isSome:
     result = fmt"{w.name}: grammar({w.grammar}), gloss({w.gloss}), category({w.category.get})"
   else:
     result = fmt"{w.name}: grammar({w.grammar}), gloss({w.gloss})"
 
-proc loadDictionary*(s: Stream): TableRef[string, Word] =
-  ## Loads the toki pona dictionary into a Table from a Stream.
+proc loadDictionary*(): TableRef[string, Word] =
+  ## Loads the toki pona dictionary into a Table from precompiled data.
+  const tpDictionary = staticRead "../data/tokipona.json"
   var
-    nodes = json.parseJson(s)
+    s = newStringStream tpDictionary
+    nodes = s.parseJson
     words = nodes.to seq[Word]
   result = newTable[string, Word]()
 
   for word in words:
     result[word.name] = word
 
-const
-  tpDictionary = staticRead "../data/tokipona.json"
-
 var
-  dict = loadDictionary(newStringStream tpDictionary)
+  dict = loadDictionary()
   rawSentence = readLineFromStdin "|toki: "
   splitSentence = rawSentence.split " "
   lastWord: Word
