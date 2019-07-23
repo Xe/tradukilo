@@ -6,7 +6,7 @@ description   = "Linguistic tools for Nim"
 license       = "0BSD"
 srcDir        = "src"
 installExt    = @["nim"]
-bin           = @["tradukilo", "sona"]
+bin           = @["tradukilo", "tradukilopkg/sona"]
 binDir        = "bin"
 
 

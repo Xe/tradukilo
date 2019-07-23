@@ -1,5 +1,5 @@
 import json, options, os, rdstdin, streams, strformat, strutils, tables
-import tradukilopkg/tokipona
+import tokipona
 
 var
   dict = loadDictionary()
