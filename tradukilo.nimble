@@ -3,7 +3,7 @@
 version       = "0.1.0"
 author        = "Christine Dodrill"
 description   = "Linguistic tools for Nim"
-license       = "MIT"
+license       = "0BSD"
 srcDir        = "src"
 installExt    = @["nim"]
 bin           = @["tradukilo", "sona"]
