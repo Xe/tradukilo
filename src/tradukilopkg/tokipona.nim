@@ -59,8 +59,7 @@ proc loadDictionary*(): TableRef[string, Word] =
   ## Loads the toki pona dictionary into a Table from precompiled data.
   const tpDictionary = staticRead "../../data/tokipona.json"
   var
-    s = newStringStream tpDictionary
-    nodes = parseJson s
+    nodes = parseJson tpDictionary
     words = nodes.to seq[Word]
   result = newTable[string, Word]()
 
